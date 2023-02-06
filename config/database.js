@@ -7,8 +7,6 @@ const connectDatabase = () => {
         useUnifiedTopology:true
     }).then(con=> {
         console.log("Database connect successfully")
-    }).catch((err) => {
-        console.log(err);
     })
 }
 

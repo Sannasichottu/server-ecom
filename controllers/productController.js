@@ -1,8 +1,9 @@
 const Product = require('../models/productModel');
-
+const ErrorHandler = require("../utils/errorHandler");
+const catchAsyncError = require("../middlewares/catchAsyncError");
 
 // Get Products - /api/v1/products
-exports.getProducts = async (req,res,next) => {
+exports.getProducts =  async (req,res,next) => {
     const products = await Product.find();
     res.status(200).json({
         success:true,
@@ -12,17 +13,57 @@ exports.getProducts = async (req,res,next) => {
 };
 
 // Create Product - /api/v1/product/new
-exports.newProduct = async (req,res, next) => {
+exports.newProduct = catchAsyncError ( async (req,res, next) => {
     const product =  await Product.create(req.body);
     res.status(201).json({
+        success:true,
+        product
+    })
+});
+
+
+// Get Single Product - /api/v1/product/:id
+exports.getSingleProduct = catchAsyncError ( async (req,res,next) => {
+    const product = await Product.findById(req.params.id);
+
+    if(!product) {
+        /* return res.status(404).json({
+            success:false,
+            message:"Product not fount"
+        }); */
+
+        return next(new ErrorHandler('Product not found', 400));
+    }
+    res.status(201).json({
+        success:true,
+        product
+    })
+});
+
+// Update Product - /api/v1/product/:id
+exports.updateProduct = async (req,res,next) => {
+    let product =  await Product.findById(req.params.id);
+
+    if(!product) {
+        return res.status(404).json({
+            success:false,
+            message:"Product not fount"
+        });
+    }
+
+    product = await Product.findByIdAndUpdate(req.params.id, req.body, {
+        new:true,
+        runValidators:true
+    })
+    res.status(200).json({
         success:true,
         product
     })
 }
 
 
-// Get Single Product
-exports.getSingleProduct = async (req,res,next) => {
+//Delete Product - /api/v1/product/:id
+exports.deleteProduct = async (req,res,next) => {
     const product = await Product.findById(req.params.id);
 
     if(!product) {
@@ -31,8 +72,11 @@ exports.getSingleProduct = async (req,res,next) => {
             message:"Product not fount"
         });
     }
-    res.status(201).json({
+
+    await product.remove();
+
+    res.status(200).json({
         success:true,
-        product
+        message:"Product Deleted!"
     })
 }
