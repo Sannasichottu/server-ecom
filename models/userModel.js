@@ -1,5 +1,6 @@
 const mongoose = require("mongoose");
 const validator = require("validator");
+const bcrypt = require('bcrypt');
 
 const userSchame = new mongoose.Schema({
     name:{
@@ -31,6 +32,10 @@ const userSchame = new mongoose.Schema({
         type:Date,
         default:Date.now()
     }
+})
+
+userSchame.pre('save', async function (next) {
+    this.password = await bcrypt.hash(this.password, 10)
 })
 
 
