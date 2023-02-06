@@ -1,16 +1,19 @@
 const Product = require('../models/productModel');
 const ErrorHandler = require("../utils/errorHandler");
 const catchAsyncError = require("../middlewares/catchAsyncError");
+const APIFeatures = require("../utils/apiFeatures");
 
 // Get Products - /api/v1/products
-exports.getProducts =  async (req,res,next) => {
-    const products = await Product.find();
+exports.getProducts =  catchAsyncError ( async (req,res,next) => {
+    const apiFeatures = new APIFeatures(Product.find(), req.query).search();
+
+    const products = await apiFeatures.query;
     res.status(200).json({
         success:true,
         count:products.length,
         products,
     })
-};
+});
 
 // Create Product - /api/v1/product/new
 exports.newProduct = catchAsyncError ( async (req,res, next) => {
@@ -41,7 +44,7 @@ exports.getSingleProduct = catchAsyncError ( async (req,res,next) => {
 });
 
 // Update Product - /api/v1/product/:id
-exports.updateProduct = async (req,res,next) => {
+exports.updateProduct = catchAsyncError ( async (req,res,next) => {
     let product =  await Product.findById(req.params.id);
 
     if(!product) {
@@ -59,11 +62,11 @@ exports.updateProduct = async (req,res,next) => {
         success:true,
         product
     })
-}
+});
 
 
 //Delete Product - /api/v1/product/:id
-exports.deleteProduct = async (req,res,next) => {
+exports.deleteProduct = catchAsyncError ( async (req,res,next) => {
     const product = await Product.findById(req.params.id);
 
     if(!product) {
@@ -79,4 +82,4 @@ exports.deleteProduct = async (req,res,next) => {
         success:true,
         message:"Product Deleted!"
     })
-}
+});
