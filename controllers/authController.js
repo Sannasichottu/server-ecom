@@ -18,14 +18,12 @@ exports.registerUser =  catchAsyncError(async (req,res,next) => {
 })
 
 //Login
-
 exports.loginUser = catchAsyncError(async (req,res,next) => {
     const {email,password} = req.body;
 
     if(!email || !password) {
         return next(new ErrorHandler('Please enter email & password',400))
     }
-
     //finding the user database
     const user = await User.findOne({email}).select('+password');
 
@@ -36,6 +34,18 @@ exports.loginUser = catchAsyncError(async (req,res,next) => {
     if(!await user.isValidPassword(password)) {
         return next(new ErrorHandler('Invalid email or password',401))
     }
-
     sendToken(user, 201, res);
+})
+
+// Logout
+exports.logoutUser = catchAsyncError (async(req,res,next) => {
+    res.cookie('token',null,{
+        expires:new Date(Date.now()),
+        httpOnly: true
+    })
+
+    res.status(200).json({
+        success:true,
+        message:"Loggedout"
+    })
 })
