@@ -18,7 +18,9 @@ exports.getProducts =  catchAsyncError ( async (req,res,next) => {
 
 // Create Product - /api/v1/product/new
 exports.newProduct = catchAsyncError ( async (req,res, next) => {
-    const product =  await Product.create(req.body);
+
+    //req.body.user = req.user.id; - 2.21.36 part 3
+    const product = await Product.create(req.body);
     res.status(201).json({
         success:true,
         product
@@ -29,7 +31,6 @@ exports.newProduct = catchAsyncError ( async (req,res, next) => {
 // Get Single Product - /api/v1/product/:id
 exports.getSingleProduct = catchAsyncError ( async (req,res,next) => {
     const product = await Product.findById(req.params.id);
-
     if(!product) {
         /* return res.status(404).json({
             success:false,
