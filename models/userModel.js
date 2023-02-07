@@ -51,7 +51,7 @@ userSchame.methods.getJwtToken = function () {
 }
 
 userSchame.methods.isValidPassword = async function(enteredPassword) {
-    return await bcrypt.compare(enteredPassword,this.password)
+    return bcrypt.compare(enteredPassword,this.password)
 }
 
 userSchame.methods.getResetToken = function() {
