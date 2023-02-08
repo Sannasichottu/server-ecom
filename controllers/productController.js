@@ -139,3 +139,33 @@ exports.getReviews = catchAsyncError ( async (req,res,next) => {
         reviews : product.reviews
     })
 })
+
+//Delete Review - /api/v1/review
+exports.deleteReiew = catchAsyncError(async (req,res,next) => {
+    const product = await Product.findById(req.query.productId);
+    //filtering the reviews which does not match the deleteing review id
+    const reviews = product.reviews.filter(review => {
+        return review._id.toString() !== req.query.id.toString()
+    });
+
+    //number of reviews update
+    const numOfReviews = reviews.length;
+
+    //finding the average with the filtered reviews
+    let ratings = reviews.reduce((acc,review) => {
+        return review.rating + acc;
+    }, 0) / reviews.length;
+
+    //save the product document
+    ratings = isNaN(ratings) ? 0 : ratings;
+
+    await Product.findByIdAndUpdate(req.query.productId, {
+        reviews,
+        numOfReviews,
+        ratings
+    })
+
+    res.status(200).json({
+        success:true
+    })
+})
