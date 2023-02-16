@@ -42,7 +42,10 @@ exports.newProduct = catchAsyncError(async (req, res, next) => {
 
 // Get Single Product - /api/v1/product/:id
 exports.getSingleProduct = catchAsyncError(async (req, res, next) => {
-  const product = await Product.findById(req.params.id);
+  const product = await Product.findById(req.params.id).populate(
+    "reviews.user",
+    "name email"
+  );
   if (!product) {
     /* return res.status(404).json({
             success:false,
