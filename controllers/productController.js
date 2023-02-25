@@ -32,16 +32,14 @@ exports.getProducts = catchAsyncError(async (req, res, next) => {
 
 // Create Product - /api/v1/product/new
 exports.newProduct = catchAsyncError(async (req, res, next) => {
+  //uploading images
   let images = [];
-
   if (req.files.length > 0) {
     req.files.forEach((file) => {
-      //let url = `${process.env.BACKEND_URL}/uploads/product/${req.file.originalname}`;
       let url = `${process.env.BACKEND_URL}/uploads/product/${file.originalname}`;
       images.push({ image: url });
     });
   }
-
   req.body.images = images;
 
   req.body.user = req.user.id;
@@ -75,6 +73,22 @@ exports.getSingleProduct = catchAsyncError(async (req, res, next) => {
 // Update Product - /api/v1/product/:id
 exports.updateProduct = catchAsyncError(async (req, res, next) => {
   let product = await Product.findById(req.params.id);
+
+  //Uploading Images
+  let images = [];
+
+  //if images not cleared we keep exisiting images
+  if (req.body.imagesCleared === "false") {
+    images = product.images;
+  }
+
+  if (req.files.length > 0) {
+    req.files.forEach((file) => {
+      let url = `${process.env.BACKEND_URL}/uploads/product/${file.originalname}`;
+      images.push({ image: url });
+    });
+  }
+  req.body.images = images;
 
   if (!product) {
     return res.status(404).json({
