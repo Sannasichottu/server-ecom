@@ -23,6 +23,13 @@ app.use("/api/v1/", auth);
 app.use("/api/v1/", order);
 app.use("/api/v1/", payment);
 
+if (process.env.NODE_ENV === "production") {
+  app.use(express.static(path.join(__dirname, "../client-ecom/build")));
+  app.get("*", (req, res) => {
+    res.sendFile(path.resolve(__dirname, "../client-ecom/build/index.html"));
+  });
+}
+
 app.use(errorMiddleware);
 
 module.exports = app;
