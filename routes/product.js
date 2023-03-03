@@ -35,8 +35,6 @@ router.route("/product/:id").get(getSingleProduct);
 
 //review
 router.route("/review").put(isAuthenticateUser, createReview);
-router.route("/reviews").get(getReviews);
-router.route("/review").delete(deleteReiew);
 
 //Admin routes
 router
@@ -61,5 +59,11 @@ router
     upload.array("images"),
     updateProduct
   );
+router
+  .route("/admin/reviews")
+  .get(isAuthenticateUser, authorizeRoles("admin"), getReviews);
+router
+  .route("/admin/review")
+  .delete(isAuthenticateUser, authorizeRoles("admin"), deleteReiew);
 
 module.exports = router;
